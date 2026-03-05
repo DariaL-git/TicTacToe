@@ -24,12 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include "retarget_stdio.h"
-#include "i2c_lcd.h"
 #include "ui_uart.h"
+#include "game_loop.h"
 #include "enums.h"
-#include "game_logic.h"
+#include "i2c_lcd.h"
+#include "retarget_stdio.h"
 
 /* USER CODE END Includes */
 
@@ -124,11 +123,11 @@ int main(void)
   }
   printf("scan end\r\n");
 */
-  ui_state_t prev = ui_get_state();
+/* ui_state_t prev = ui_get_state();
   game_t g;
   uint8_t game_ready = 0;
   uint32_t timer = HAL_GetTick();
-
+*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -143,7 +142,14 @@ int main(void)
 	 // printf("System hren\r\n");
 	 // HAL_Delay(1000);
 
-	  // Startup menu. Single-key input (no Enter required).
+
+	    game_mode_t mode;
+	    uint8_t n;
+
+	    ui_menu_run(&mode, &n);
+	    game_loop_run(mode, n);
+
+	  /*// Startup menu. Single-key input (no Enter required).
 	  uint8_t b = getchar();   // wait for input
 	  ui_handle_input(b);
 
@@ -162,7 +168,7 @@ int main(void)
 	      timer = HAL_GetTick();
 	      ui_uart_tick_500ms(&g);
 	    }
-	  //game_task();
+	  //game_task();*/
 
   }
   /* USER CODE END 3 */

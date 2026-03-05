@@ -93,9 +93,9 @@ void ui_handle_input(uint8_t b)
     //
     case UI_MENU_SIZE:
         if (b >= '3' && b <= '9') {
-            board_size = (uint8_t)(b - '0'); // TODO!!!
-            printf("\r\nBoard: %dx%d\r\n", board_size, board_size);
-            board_size =  '3'-'0';
+           /* board_size = (uint8_t)(b - '0'); // TODO!!!
+            printf("\r\nBoard: %dx%d\r\n", board_size, board_size);*/
+            board_size =  '3'-'0';  // TODO!!!!: enable real sizes later
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);
             ui = UI_GAME;
             printf("Press q to quit\r\n> ");
@@ -124,13 +124,31 @@ void ui_handle_input(uint8_t b)
     }
 }
 
+void ui_menu_run(game_mode_t *mode, uint8_t *n)
+{
+    ui_init();
+
+    while (1)
+    {
+        uint8_t b = getchar();
+        if (b == '\r' || b == '\n') continue;
+
+        ui_handle_input(b);
+
+        if (ui_get_state() == UI_GAME)
+            break;
+    }
+
+    *mode = ui_get_mode();
+    *n    = ui_get_size();
+}
 
 //
 
 void ui_uart_tick_500ms(game_t *g)
 {
+	(void)g;
     show_numbers ^= 1;
-    ui_uart_render(g);
 }
 
 static void print_cell(uint8_t idx, cell_t c)
@@ -146,8 +164,9 @@ static void print_cell(uint8_t idx, cell_t c)
 
 void ui_uart_render(game_t *g)
 {
-    //printf("\033[2J\033[H");
+    printf("\033[2J\033[H");
 
+	printf("Press q to quit\r\n");
     for (int r = 0; r < board_size; r++)
     {
         for (int i = 0; i < board_size; i++)
