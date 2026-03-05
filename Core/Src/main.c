@@ -24,11 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#include "retarget_stdio.h"
-#include "i2c_lcd.h"
 #include "ui_uart.h"
+#include "game_loop.h"
 #include "enums.h"
+#include "i2c_lcd.h"
+#include "retarget_stdio.h"
 
 /* USER CODE END Includes */
 
@@ -98,7 +98,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
 
-
   ui_init();
 
   /*  //test UART
@@ -109,13 +108,12 @@ int main(void)
   RetargetInit(&huart2);
   printf("System start\r\n");
 
-
-  //test LCD
+*/
   lcd_init(&hi2c1);
   lcd_clr();
   char *s = "LCD OK!";
   for (int i = 0; s[i] && i < 8; i++) lcd_putc(s[i]);
-
+/*
   //test LCD connecttion
   printf("I2C scan...\r\n");
   for (uint8_t a = 1; a < 0x7F; a++) {
@@ -125,8 +123,11 @@ int main(void)
   }
   printf("scan end\r\n");
 */
-
-
+/* ui_state_t prev = ui_get_state();
+  game_t g;
+  uint8_t game_ready = 0;
+  uint32_t timer = HAL_GetTick();
+*/
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -141,19 +142,37 @@ int main(void)
 	 // printf("System hren\r\n");
 	 // HAL_Delay(1000);
 
-	  // Startup menu. Single-key input (no Enter required).
 
+	    game_mode_t mode;
+	    uint8_t n;
+
+	    ui_menu_run(&mode, &n);
+	    game_loop_run(mode, n);
+
+	  /*// Startup menu. Single-key input (no Enter required).
 	  uint8_t b = getchar();   // wait for input
 	  ui_handle_input(b);
-	  if (ui_get_state() == UI_GAME)
-		  printf("GAME lesssplayyyyy...\r\n");
 
-	  //game_task();
+	  ui_state_t cur = ui_get_state();
+
+	  if (cur == UI_GAME && prev != UI_GAME)
+	  {
+	      game_init(&g, ui_get_size(), ui_get_mode());
+	      ui_uart_render(&g);
+	  }
+
+	  prev = cur;
+
+	    if (HAL_GetTick() - timer >= 500)
+	    {
+	      timer = HAL_GetTick();
+	      ui_uart_tick_500ms(&g);
+	    }
+	  //game_task();*/
 
   }
   /* USER CODE END 3 */
 }
-
 /**
   * @brief System Clock Configuration
   * @retval None
