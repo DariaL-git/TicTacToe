@@ -22,7 +22,7 @@ int input_get_move(uint8_t n)
     if (b == 'q')
         return -2;
 
-    // пока один символ -> только '1'..'9'
+    // only one symbol yet -> '1'..'9'!!!!!!!!!TODO
     if (b >= '1' && b <= '9')
     {
         uint16_t cell = (uint16_t)(b - '1');        // '1'->0 ... '9'->8

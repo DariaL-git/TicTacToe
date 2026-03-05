@@ -25,22 +25,22 @@ void game_loop_run(game_mode_t mode, uint8_t n)
             redraw = 1;
         }
 
-        // 2) input (not blocked)
+        // 2) human input (not blocked):
         // return values:
         // -1 = no input
         // -2 = quit
         // 0..(n*n-1) = cell index
         int cell = input_get_move(n);
-
-        if (cell == -2)
-            return;
+        if (cell == -2) return;
 
         if (cell >= 0)
-        {
             redraw |= game_make_move(&g, (uint16_t)cell);
-        }
 
-        // 3) render only if needed
+        // 3) AI step (AI may move now: CLASSIC_MODE waits, SPEED_MODE uses timer)
+        if (ai_can_move_now(&g))
+            redraw |= game_ai_step(&g);
+
+        // 4) render
         if (redraw)
             ui_uart_render(&g);
     }

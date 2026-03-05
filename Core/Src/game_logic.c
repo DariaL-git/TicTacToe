@@ -1,11 +1,13 @@
 #include "game_logic.h"
+#include "main.h"
 
 void game_init(game_t *g, uint8_t n, game_mode_t mode)
 {
     g->mode = mode;
     g->n = n;
-    g->turn = CELL_X;
+    g->turn = (HAL_GetTick() & 1);  // 0=X first, 1=O first (random)
     g->moves = 0;
+    g->ai_next = HAL_GetTick() + 500;
 
 
     for (uint8_t y = 0; y < n; y++)
@@ -28,4 +30,49 @@ uint8_t game_make_move(game_t *g, uint16_t cell)
     g->turn ^= 1;										//switch player
     return 1;											//move applied successfully (board state changed)
 
+}
+
+uint8_t ai_can_move_now(game_t *g)
+{
+    switch (g->mode)
+    {
+    case MODE_CLASSIC:
+        if (g->turn != 1)     // AI = O
+            return 0;
+        return 1;
+
+    case MODE_SPEED:
+        return speed_timer_ready(g);
+
+    default:
+        return 0;
+    }
+}
+
+uint8_t speed_timer_ready(game_t *g)
+{
+    if ((int32_t)(HAL_GetTick() - g->ai_next) >= 0)
+    {
+        g->ai_next += 500;
+        return 1;
+    }
+    return 0;
+}
+
+uint8_t game_ai_step(game_t *g)
+{
+    uint16_t max = (uint16_t)g->n * (uint16_t)g->n;
+
+    for (uint16_t cell = 0; cell < max; cell++)
+    {
+        uint8_t r = cell / g->n;
+        uint8_t c = cell % g->n;
+
+        if (g->board[r][c] == CELL_EMPTY)
+        {
+            return game_make_move(g, cell); // make O (turn==1) and switch
+        }
+    }
+
+    return 0; // no move possible
 }

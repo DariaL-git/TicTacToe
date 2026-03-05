@@ -22,6 +22,7 @@ static void show_mode_menu(void)
     printf("\r\n=== CHOOSE MODE ===\r\n");
     printf("1 - Classic\r\n");
     printf("2 - Speed\r\n");
+    printf("3 - two players\r\n");
     printf("0 - Back\r\n> ");
 }
 
@@ -76,8 +77,14 @@ void ui_handle_input(uint8_t b)
     	    show_choose_size();
     	}
     	else if (b == '2') {
-    	    printf("\r\nSpeed not yet available -> Classic\r\n");
-    	    game_mode = MODE_CLASSIC;
+    	    printf("\r\nSpeed selected\r\n");
+    	    game_mode = MODE_SPEED;
+    	    ui = UI_MENU_SIZE;
+    	    show_choose_size();
+    	}
+    	else if (b == '3') {
+    	    printf("\r\nSpeed selected\r\n");
+    	    game_mode = MODE_2P;
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
     	}
