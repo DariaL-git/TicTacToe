@@ -4,6 +4,7 @@
 #include "enums.h"
 #include "game_logic.h"
 
+static uint8_t show_numbers = 1;
 
 
 static void show_main(void)
@@ -44,6 +45,7 @@ static void show_rules(void)
 
 static ui_state_t ui = UI_MENU_MAIN;
 static game_mode_t game_mode = MODE_CLASSIC;
+static uint8_t board_size;
 
 void ui_init(void)
 {
@@ -91,7 +93,7 @@ void ui_handle_input(uint8_t b)
     //
     case UI_MENU_SIZE:
         if (b >= '3' && b <= '9') {
-            uint8_t board_size = (uint8_t)(b - '0'); // TODO!!!
+            board_size = (uint8_t)(b - '0'); // TODO!!!
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);
             board_size =  '3'-'0';
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);
@@ -122,8 +124,66 @@ void ui_handle_input(uint8_t b)
     }
 }
 
+
+//
+
+void ui_uart_tick_500ms(game_t *g)
+{
+    show_numbers ^= 1;
+    ui_uart_render(g);
+}
+
+static void print_cell(uint8_t idx, cell_t c)
+{
+    if (c == CELL_X) printf(" X ");
+    else if (c == CELL_O) printf(" O ");
+    else
+    {
+        if (show_numbers) printf(" %d ", idx+1);
+        else              printf("   ");
+    }
+}
+
+void ui_uart_render(game_t *g)
+{
+    //printf("\033[2J\033[H");
+
+    for (int r = 0; r < board_size; r++)
+    {
+        for (int i = 0; i < board_size; i++)
+            printf("+---");
+        printf("+\r\n|");
+
+        for (int c = 0; c < board_size; c++)
+        {
+            int idx = r * board_size + c;
+            print_cell(idx, g->board[r][c]);
+            printf("|");
+        }
+        printf("\r\n");
+    }
+
+    for (int i = 0; i < board_size; i++)
+        printf("+---");
+    printf("+\r\n");
+}
+
+
+
+//GETTERS
+
 ui_state_t ui_get_state(void)
 {
     return ui;
+}
+
+uint8_t ui_get_size(void)
+{
+    return board_size;
+}
+
+game_mode_t ui_get_mode(void)
+{
+    return game_mode;
 }
 

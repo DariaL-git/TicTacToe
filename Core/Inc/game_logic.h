@@ -15,6 +15,7 @@ typedef enum {
 } game_mode_t;
 
 typedef struct {
+    game_mode_t mode;					   // game mode
     uint8_t n;                             // size of board
     cell_t board[GAME_MAX_N][GAME_MAX_N];  // board array
     cell_t turn;                           // who turns?
