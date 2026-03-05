@@ -1,37 +1,36 @@
 #include "input.h"
+#include "main.h"
+#include "usart.h"
 
-static uint8_t handle_classic(game_t *g, uint8_t b)
+
+extern UART_HandleTypeDef huart2;
+
+static int uart_try_get(uint8_t *b)
 {
-    // TODO: сейчас заглушка
-    (void)g; (void)b;
-    return 0;
+    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET)
+        return 0;
+    HAL_UART_Receive(&huart2, b, 1, 0);
+    return 1;
 }
 
-static uint8_t handle_speed(game_t *g, uint8_t b)
+int input_get_move(uint8_t n)
 {
-    return handle_classic(g, b);
-}
+    uint8_t b;
+    if (!uart_try_get(&b))
+        return -1;
 
-uint8_t input_handle(game_mode_t mode, game_t *g, uint8_t b)
-{
-    switch (mode)
+    if (b == 'q')
+        return -2;
+
+    // only one symbol yet -> '1'..'9'!!!!!!!!!TODO
+    if (b >= '1' && b <= '9')
     {
-    case MODE_CLASSIC: return handle_classic(g, b);
-    case MODE_SPEED:   return handle_speed(g, b);
-    default:           return handle_classic(g, b);
+        uint16_t cell = (uint16_t)(b - '1');        // '1'->0 ... '9'->8
+        uint16_t max  = (uint16_t)n * (uint16_t)n;  // n*n
+
+        if (cell < max)
+            return (int)cell;
     }
 
-
-
-}
-
-static uint8_t handle_input_classic(game_t *g, uint8_t b)
-{
-    (void)g; (void)b;
-    return 0; // TODO
-}
-
-static uint8_t handle_input_speed(game_t *g, uint8_t b)
-{
-    return handle_input_classic(g, b);
+    return -1;
 }

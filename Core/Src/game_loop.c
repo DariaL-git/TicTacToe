@@ -4,20 +4,6 @@
 #include "main.h"
 #include "input.h"
 
-extern UART_HandleTypeDef huart2;
-static uint8_t handle_input_classic(game_t *g, uint8_t b);
-static uint8_t handle_input_speed(game_t *g, uint8_t b);
-
-static int uart_try_get(uint8_t *b)
-{
-    if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_RXNE) == RESET)
-        return 0;
-
-    HAL_UART_Receive(&huart2, b, 1, 0);
-    return 1;
-}
-
-
 void game_loop_run(game_mode_t mode, uint8_t n)
 {
     game_t g;
@@ -39,15 +25,22 @@ void game_loop_run(game_mode_t mode, uint8_t n)
             redraw = 1;
         }
 
-        // 2) input (not blocked)
-        uint8_t b;
-        if (uart_try_get(&b))
-        {
-            if (b == 'q') return;
-            redraw |= input_handle(mode, &g, b);
-        }
+        // 2) human input (not blocked):
+        // return values:
+        // -1 = no input
+        // -2 = quit
+        // 0..(n*n-1) = cell index
+        int cell = input_get_move(n);
+        if (cell == -2) return;
 
-        // 3) render only if needed
+        if (cell >= 0)
+            redraw |= game_make_move(&g, (uint16_t)cell);
+
+        // 3) AI step (AI may move now: CLASSIC_MODE waits, SPEED_MODE uses timer)
+        if (ai_can_move_now(&g))
+            redraw |= game_ai_step(&g);
+
+        // 4) render
         if (redraw)
             ui_uart_render(&g);
     }
