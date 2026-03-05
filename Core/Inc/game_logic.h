@@ -23,3 +23,6 @@ typedef struct {
 } game_t;
 
 void game_init(game_t *g, uint8_t n, game_mode_t mode);
+
+// return 1 if move applied (board changed), else 0
+uint8_t game_make_move(game_t *g, uint16_t cell);
