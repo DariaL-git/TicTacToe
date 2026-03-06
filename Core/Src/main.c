@@ -145,30 +145,8 @@ int main(void)
 
 	    game_mode_t mode;
 	    uint8_t n;
-
 	    ui_menu_run(&mode, &n);
 	    game_loop_run(mode, n);
-
-	  /*// Startup menu. Single-key input (no Enter required).
-	  uint8_t b = getchar();   // wait for input
-	  ui_handle_input(b);
-
-	  ui_state_t cur = ui_get_state();
-
-	  if (cur == UI_GAME && prev != UI_GAME)
-	  {
-	      game_init(&g, ui_get_size(), ui_get_mode());
-	      ui_uart_render(&g);
-	  }
-
-	  prev = cur;
-
-	    if (HAL_GetTick() - timer >= 500)
-	    {
-	      timer = HAL_GetTick();
-	      ui_uart_tick_500ms(&g);
-	    }
-	  //game_task();*/
 
   }
   /* USER CODE END 3 */
