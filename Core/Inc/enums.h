@@ -8,3 +8,14 @@ typedef enum {
   UI_GAME
 } ui_state_t;
 
+typedef enum {
+    GAME_IN_PROGRESS = 0,
+    GAME_WIN,
+    GAME_DRAW
+} game_state_t;
+
+typedef enum {
+    CELL_EMPTY = 0,
+    CELL_X,
+    CELL_O
+} cell_t;

@@ -72,18 +72,18 @@ void ui_handle_input(uint8_t b)
     case UI_MENU_MODE:
     	if (b == '1') {
     		game_mode = MODE_CLASSIC;
-    	    printf("\r\nClassic selected\r\n");
+    	    printf("\r\nClassic mode selected\r\n");
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
     	}
     	else if (b == '2') {
-    	    printf("\r\nSpeed selected\r\n");
+    	    printf("\r\nSpeed mode selected\r\n");
     	    game_mode = MODE_SPEED;
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
     	}
     	else if (b == '3') {
-    	    printf("\r\nSpeed selected\r\n");
+    	    printf("\r\nTwo players mode selected\r\n");
     	    game_mode = MODE_2P;
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
@@ -152,7 +152,7 @@ void ui_menu_run(game_mode_t *mode, uint8_t *n)
 
 //
 
-void ui_uart_tick_500ms(game_t *g)
+void ui_uart_tick_ms(game_t *g)
 {
 	(void)g;
     show_numbers ^= 1;
@@ -174,26 +174,41 @@ void ui_uart_render(game_t *g)
     printf("\033[2J\033[H");
 
 	printf("Press q to quit\r\n");
-    for (int r = 0; r < board_size; r++)
+    for (int r = 0; r < g->board_size; r++)
     {
-        for (int i = 0; i < board_size; i++)
+        for (int i = 0; i < g->board_size; i++)
             printf("+---");
         printf("+\r\n|");
 
-        for (int c = 0; c < board_size; c++)
+        for (int c = 0; c < g->board_size; c++)
         {
-            int idx = r * board_size + c;
+            int idx = r * g->board_size + c;
             print_cell(idx, g->board[r][c]);
             printf("|");
         }
         printf("\r\n");
     }
 
-    for (int i = 0; i < board_size; i++)
+    for (int i = 0; i < g->board_size; i++)
         printf("+---");
     printf("+\r\n");
 }
 
+void show_game_over(game_t *g)
+{
+    ui_uart_render(g);
+
+    if (g->state == GAME_WIN)
+    {
+        (g->turn == 0) ?
+        printf("\r\nO wins!\r\n")
+        : printf("\r\nX wins!\r\n");
+    }
+    else if (g->state == GAME_DRAW)
+    {
+        printf("\r\nDraw!\r\n");
+    }
+}
 
 
 //GETTERS
