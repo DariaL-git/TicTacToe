@@ -1,17 +1,17 @@
-#include "game_loop.h"
+#include <game_controller.h>
 #include "game_logic.h"
-#include "ui_uart.h"
 #include "main.h"
 #include "input.h"
 #include <stdio.h>
+#include <view.h>
 
-void game_loop_run(game_mode_t mode, uint8_t n)
+void game_controller_run(game_mode_t mode, uint8_t n)
 {
     game_t g;
     game_init(&g, n, mode);
 
     uint32_t next500 = HAL_GetTick() + 500;
-    ui_uart_render(&g);
+    render_gameboard_uart(&g);
 
     while (1)
     {
@@ -32,22 +32,21 @@ void game_loop_run(game_mode_t mode, uint8_t n)
             return;
 
         // 3) moves only while game is active
-        if (g.state == GAME_IN_PROGRESS)
-         {
-             if (cell >= 0)
-                 redraw |= game_apply_move(&g, (uint16_t)cell);
-             if (g.state == GAME_IN_PROGRESS && ai_can_move_now(&g))
-                 redraw |= game_ai_step(&g);
-         }
+               if (g.state == GAME_IN_PROGRESS)
+                {
+                    if (cell >= 0)
+                        redraw |= game_apply_move(&g, (uint16_t)cell);
+                    if (g.state == GAME_IN_PROGRESS && ai_can_move_now(&g))
+                        redraw |= game_ai_step(&g);
+                }
 
         // 4) render
-
         if (redraw)
-            ui_uart_render(&g);
+            render_gameboard_uart(&g);
 
         if (g.state != GAME_IN_PROGRESS)
         {
-        	show_game_over(&g);
+        	show_game_over_uart(&g);
 
             while (1)
             {

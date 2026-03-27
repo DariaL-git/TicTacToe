@@ -1,3 +1,4 @@
+#include <game_controller.h>
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -18,17 +19,19 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ui_uart.h"
-#include "game_loop.h"
+#include "view.h"
 #include "enums.h"
 #include "i2c_lcd.h"
 #include "retarget_stdio.h"
+#include "neopixel.h"
 
 /* USER CODE END Includes */
 
@@ -50,7 +53,24 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+/*uint16_t pwmData[64] = {
+    // G = 0
+    20,20,20,20,20,20,20,20,
 
+    // R = 255
+    40,40,40,40,40,40,40,40,
+
+    // B = 0
+    20,20,20,20,20,20,20,20,
+
+    // reset
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0
+};
+*/
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,7 +81,31 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/*void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+{
+    static uint32_t count=0;
+    static uint8_t down_nup = 0;
 
+    if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+    {
+        if (count>=500)
+        {
+            count=0;
+            if (down_nup==0)
+            {
+                TIM2->CCR2++;
+                if (TIM2->CCR2>99) down_nup=1;
+            }
+            else
+            {
+                TIM2->CCR2--;
+                if (TIM2->CCR2<1) down_nup=0;
+            }
+        }
+        count++;
+    }
+}
+*/
 /* USER CODE END 0 */
 
 /**
@@ -93,12 +137,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_I2C1_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
-
-  ui_init();
+  menu_init();
 
   /*  //test UART
   uint8_t msg[] = "Hello\r\n";
@@ -123,34 +169,71 @@ int main(void)
   }
   printf("scan end\r\n");
 */
+
 /* ui_state_t prev = ui_get_state();
   game_t g;
   uint8_t game_ready = 0;
   uint32_t timer = HAL_GetTick();
 */
+
+  //HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)pwmData, 64);
+  uint32_t pwm_dat[1000];
+  for(int i=0;i<500;i++) pwm_dat[i]=i/5;
+  for(int i=500;i<1000;i++) pwm_dat[i]=200-i/5;
+
+  if (HAL_OK != HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_2, pwm_dat, 1000))
+  {
+      Error_Handler();
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint8_t r=0,g=0,b=0,loop=0;
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  set_color(r,g,b);
+	      HAL_Delay(10);
+
+	      switch(loop)
+	      {
+	          case 0: r++;                 // rot dimmen
+	              if (r==0) loop++;
+	              break;
+
+	          case 1: g++;                 // gruen dimmen
+	              if (g==0) loop++;
+	              break;
+
+	          case 2: b++;                 // blau dimmen
+	              if (b==0) loop++;
+	              break;
+
+	          case 3: b++; r++; g++;       // weiss dimmen
+	              if (r==0) loop=0;
+	              break;
+
+	          default: loop=0;
+	      }
 
 	//HAL_GPIO_TogglePin(LD3_GPIO_Port,LD3_Pin);
-	 // printf("System hren\r\n");
+	  //printf("System hren\r\n");
 	 // HAL_Delay(1000);
 
 
 	    game_mode_t mode;
 	    uint8_t n;
-	    ui_menu_run(&mode, &n);
-	    game_loop_run(mode, n);
+	    menu_controller_run(&mode, &n);
+	    game_controller_run(mode, n);
 
   }
   /* USER CODE END 3 */
 }
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -173,7 +256,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_10;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -189,7 +272,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }

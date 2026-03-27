@@ -1,0 +1,6 @@
+#ifndef INC_NEOPIXEL_H_
+#define INC_NEOPIXEL_H_
+
+void set_color(uint8_t red, uint8_t green, uint8_t blue);
+
+#endif /* INC_NEOPIXEL_H_ */
