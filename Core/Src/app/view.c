@@ -4,7 +4,7 @@
 void show_main(void)
 {
 	show_main_uart();
-	//show_main_lcd();
+	show_main_lcd();
 	//show_main_ring();
 }
 
@@ -81,12 +81,3 @@ void show_mode_menu_ring(void)
 }
 
 */
-
-
-
-
-
-
-
-
-

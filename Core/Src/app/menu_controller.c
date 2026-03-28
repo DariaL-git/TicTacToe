@@ -107,4 +107,3 @@ void menu_handle_input(uint8_t key)
         break;
     }
 }
-
