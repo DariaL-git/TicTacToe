@@ -113,9 +113,12 @@ void lcd_putc(char c)
  **/
 void lcd_put_str(char* str)
 {
- // todo
+    while (*str != '\0')
+    {
+        lcd_putc(*str);
+        str++;
+    }
 }
-
 /**
  * lcd_cur_pos
  *
@@ -126,8 +129,17 @@ void lcd_put_str(char* str)
  **/
 void lcd_cur_pos(uint8_t x, uint8_t y)
 {
-	//todo
+    uint8_t addr;
 
+    if (x > 7) x = 7;
+    if (y > 1) y = 1;
+
+    if (y == 0)
+        addr = x;
+    else
+        addr = 0x40 + x;
+
+    write_command(0x80 | addr);
 }
 
 /**
@@ -141,6 +153,15 @@ void lcd_cur_pos(uint8_t x, uint8_t y)
  **/
 void lcd_set_cur_blink(cursor_mode_t cur, cursor_mode_t blink)
 {
-   // todo
+    uint8_t cmd = 0x08;   // Display ON/OFF control
+    cmd |= 0x04;          // Display an
+
+    if (cur == on)
+        cmd |= 0x02;
+
+    if (blink == on)
+        cmd |= 0x01;
+
+    write_command(cmd);
 }
 

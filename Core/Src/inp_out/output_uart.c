@@ -111,4 +111,3 @@ void show_game_over_uart(game_t *g)
 
     printf("Press 0 to return\r\n");
 }
-
