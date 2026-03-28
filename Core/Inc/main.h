@@ -31,6 +31,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#pragma once
+#include <stdint.h>
+#include "enums.h"
 
 /* USER CODE END Includes */
 

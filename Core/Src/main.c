@@ -32,6 +32,7 @@
 #include "i2c_lcd.h"
 #include "retarget_stdio.h"
 #include "neopixel.h"
+#include "menu_controller.h"
 
 /* USER CODE END Includes */
 
@@ -144,7 +145,6 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
-  menu_init();
 
   /*  //test UART
   uint8_t msg[] = "Hello\r\n";

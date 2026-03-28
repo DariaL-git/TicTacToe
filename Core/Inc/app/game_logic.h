@@ -12,6 +12,7 @@ typedef struct {
     cell_t board[GAME_MAX_N][GAME_MAX_N];  // board array
     uint8_t turn;          				   // 0 = X, 1 = O who turns?
     uint16_t moves;                        // number of turns
+    cell_t winner;
     uint32_t ai_next;
     game_state_t state;
 } game_t;
@@ -20,7 +21,7 @@ void game_init(game_t *g, uint8_t board_size, game_mode_t mode);
 uint8_t game_make_move(game_t *g, uint16_t cell);
 uint8_t game_check_winner(const game_t *g);
 uint8_t game_is_draw(const game_t *g);
-uint8_t game_apply_move(game_t *g, uint16_t cell);
 uint8_t speed_timer_ready(game_t *g);
 uint8_t ai_can_move_now(game_t *g);
 uint8_t game_ai_step(game_t *g);
+uint8_t game_player_move(game_t *g, uint16_t cell);

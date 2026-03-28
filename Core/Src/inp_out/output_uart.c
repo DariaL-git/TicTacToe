@@ -99,9 +99,12 @@ void show_game_over_uart(game_t *g)
 
     if (g->state == GAME_WIN)
     {
-        (g->turn == 0) ?
-        printf("\r\nO wins!\r\n")
-        : printf("\r\nX wins!\r\n");
+    	{
+    	    if (g->winner == CELL_X)
+    	        printf("\r\nX wins!\r\n");
+    	    else if (g->winner == CELL_O)
+    	        printf("\r\nO wins!\r\n");
+    	}
     }
     else if (g->state == GAME_DRAW)
     {

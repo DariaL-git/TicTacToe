@@ -6,10 +6,11 @@ void game_init(game_t *g, uint8_t board_size, game_mode_t mode)
 {
     g->mode = mode;
     g->board_size = board_size;
-    g->turn = (HAL_GetTick() & 1);  // 0=X first, 1=O first (random)
+    g->turn = (HAL_GetTick() & 1);  // 0=X first, 1=O first (random) for classik/2P mode
     g->moves = 0;
-    g->ai_next = HAL_GetTick() + 900;
+    g->ai_next = HAL_GetTick() + TICK_MS;
     g->state = GAME_IN_PROGRESS;
+    g->winner = CELL_EMPTY;
 
     for (uint8_t y = 0; y < board_size; y++)
         for (uint8_t x = 0; x < board_size; x++)
@@ -21,23 +22,30 @@ uint8_t game_make_move(game_t *g, uint16_t cell)
 {
     uint16_t max = (uint16_t)g->board_size * (uint16_t)g->board_size;
     if (cell >= max) return 0;
+
     uint8_t r = cell / g->board_size;
     uint8_t c = cell % g->board_size;
 
-    if (g->board[r][c] != CELL_EMPTY)
-        return 0;      										// if cell empty
+    if (g->board[r][c] != CELL_EMPTY)					// if cell empty?
+        return 0;
 
-    else
+    cell_t placed = (g->turn == 0) ? CELL_X : CELL_O;	//place X or O in the cell depending on whose turn it is
+    g->board[r][c] = placed;
+    g->moves++;												//moves counter
+
+    if (game_check_winner(g))
     {
-    	g->board[r][c] = (g->turn == 0) ? CELL_X : CELL_O; 	//place X or O in the cell depending on whose turn it is
-	}
+        g->state = GAME_WIN;
+        g->winner = placed;
+    }
+    else if (game_is_draw(g))
+    {
+        g->state = GAME_DRAW;
+    }
 
     g->turn ^= 1;
-    g->moves++;												//moves counter
-	return 1;												//move applied successfully (board state changed)
-	return 0;
+    return 1;												//move applied successfully (board state changed)
 }
-
 
 uint8_t game_check_winner(const game_t *g)
 {
@@ -107,20 +115,7 @@ uint8_t game_player_move(game_t *g, uint16_t cell)
 {
 	if (g->mode == MODE_SPEED)
     g->turn = 0;   // human player = X
-    return game_apply_move(g, cell);
-}
-
-uint8_t game_apply_move(game_t *g, uint16_t cell)
-{
-    if (!game_make_move(g, cell))
-        return 0;
-
-    if (game_check_winner(g))
-        g->state = GAME_WIN;
-    else if (game_is_draw(g))
-        g->state = GAME_DRAW;
-
-    return 1;
+    return game_make_move(g, cell);
 }
 
 uint8_t speed_timer_ready(game_t *g)
@@ -135,6 +130,9 @@ uint8_t speed_timer_ready(game_t *g)
 
 uint8_t ai_can_move_now(game_t *g)
 {
+    if (g->state != GAME_IN_PROGRESS)
+        return 0;
+
     switch (g->mode)
     {
     case MODE_CLASSIC:
@@ -163,7 +161,7 @@ uint8_t game_ai_step(game_t *g)
 
         if (g->board[r][c] == CELL_EMPTY)
         {
-        	return game_apply_move(g, cell); // make O (turn==1) and switch
+        	return game_make_move(g, cell); // make O (turn==1) and switch
         }
     }
 

@@ -44,13 +44,13 @@ void game_controller_run(game_mode_t mode, uint8_t board_size)
             	        if (cell < board_size * board_size)
             	            redraw |= game_player_move(&g, (uint16_t)cell);
             	    }
-                    if (ai_can_move_now(&g))
+                    if (g.state == GAME_IN_PROGRESS && ai_can_move_now(&g))
                         redraw |= game_ai_step(&g);
                 }
 
         // 4) render
-        if (redraw)
-            render_gameboard(&g);
+        if (redraw && g.state == GAME_IN_PROGRESS)
+        render_gameboard(&g);
 
         if (g.state != GAME_IN_PROGRESS)
         {
