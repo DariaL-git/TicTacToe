@@ -10,3 +10,5 @@ void show_rules_uart(void);
 void render_gameboard_uart(game_t *g);
 void show_game_over_uart(game_t *g);
 void update_numbers_output_uart(game_t *g);
+
+
