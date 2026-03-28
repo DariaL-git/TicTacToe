@@ -8,6 +8,11 @@ void show_main(void)
 	//show_main_ring();
 }
 
+void show_main_scroll(void)
+{
+    show_main_lcd_scroll();
+}
+
 void show_rules(void)
 {
     show_rules_uart();

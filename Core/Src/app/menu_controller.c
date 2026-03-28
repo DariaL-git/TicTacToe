@@ -9,6 +9,7 @@
 #include "enums.h"
 #include "view.h"
 #include "input.h"
+#include "time.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -19,9 +20,17 @@ static uint8_t board_size;
 void menu_controller_run(game_mode_t *mode, uint8_t *n)
 {
     menu_init();
+    uint32_t next_scroll = time_ms() + 300;
 
     while (1)
     {
+    	uint32_t now = time_ms();
+    	if (ui == UI_MENU_MAIN && (int32_t)(now - next_scroll) >= 0)
+    	{
+    	    next_scroll = now + 300;
+    	    show_main_scroll();
+    	}
+
     	int key = get_key_input();
     	if (key < 0)
     	    continue;
