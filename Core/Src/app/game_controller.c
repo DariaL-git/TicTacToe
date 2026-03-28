@@ -14,6 +14,7 @@ void game_controller_run(game_mode_t mode, uint8_t board_size)
     game_init(&g, board_size, mode, first_turn, now);
 
     uint32_t next_ms = now + TICK_MS;
+    uint32_t anim_next = now + TICK_MS;
     uint8_t game_over_shown = 0;
     render_gameboard(&g);
 
@@ -62,11 +63,14 @@ void game_controller_run(game_mode_t mode, uint8_t board_size)
             {
                 show_game_over(&g);
                 game_over_shown = 1;
+                anim_next = now + TICK_MS;
             }
 
-            int key = get_key_input();
-            if (key == -2)
-                return;
+            if (g.state == GAME_WIN && (int32_t)(now - anim_next) >= 0)
+            {
+            	anim_next += TICK_MS;
+                animate_game_over(&g);
+            }
 
             continue;
         }

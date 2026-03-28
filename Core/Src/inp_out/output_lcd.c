@@ -31,3 +31,43 @@ void show_main_lcd_scroll(void)
     if (offset >= len)
         offset = 0;
 }
+
+void show_game_over_lcd(game_t *g)
+{
+    lcd_clr();
+
+    if (g->state == GAME_WIN)
+    {
+        lcd_cur_pos(0, 0);
+        if (g->winner == CELL_X)
+            lcd_put_str("X   X");
+        else
+            lcd_put_str("O   O");
+
+        lcd_cur_pos(0, 1);
+        lcd_put_str(" ___ ");
+    }
+    else if (g->state == GAME_DRAW)
+    {
+        lcd_cur_pos(0, 0);
+        lcd_put_str("-   -");
+        lcd_cur_pos(0, 1);
+        lcd_put_str(" ___ ");
+    }
+}
+
+void animate_game_over_lcd(game_t *g)
+{
+    static uint8_t state = 0;
+
+    if (g->state != GAME_WIN)
+        return;
+
+    lcd_cur_pos(0, 1);
+    if (state)
+        lcd_put_str(" ___ ");
+    else
+        lcd_put_str(" \x5C_/ ");
+
+    state ^= 1;
+}
