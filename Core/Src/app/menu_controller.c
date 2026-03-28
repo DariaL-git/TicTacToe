@@ -8,6 +8,7 @@
 #include "menu_controller.h"
 #include "enums.h"
 #include "view.h"
+#include "input.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -21,17 +22,17 @@ void menu_controller_run(game_mode_t *mode, uint8_t *n)
 
     while (1)
     {
-        uint8_t b = getchar();
-        if (b == '\r' || b == '\n') continue;
+    	int key = get_key_input();
+    	if (key < 0)
+    	    continue;
+    	menu_handle_input((uint8_t)key);
 
-        ui_handle_input(b);
-
-        if (get_game_state() == UI_GAME)
+        if (ui == UI_GAME)
             break;
     }
 
-    *mode = get_game_mode();
-    *n    = get_game_size();
+    *mode = game_mode;
+    *n    = board_size;
 }
 
 void menu_init(void)
@@ -40,96 +41,70 @@ void menu_init(void)
     show_main();          // print only once
 }
 
-void ui_handle_input(uint8_t b)
+void menu_handle_input(uint8_t key)
 {
-    switch (ui)
-    {
+	if (key == '0')
+	{
+	    ui = UI_MENU_MAIN;
+	    show_main();
+	    return;
+	}
 
-    //
+	switch (ui)
+    {
     case UI_MENU_MAIN:
-        if (b == '1') { show_rules(); ui = UI_RULES; }
-        else if (b == '2') { show_mode_menu(); ui = UI_MENU_MODE;}
-        else if (b != '\r' && b != '\n') {
+        if (key == '1') { show_rules(); ui = UI_RULES; }
+        else if (key == '2') { show_mode_menu(); ui = UI_MENU_MODE;}
+        else if (key != '\r' && key != '\n') {
             printf("\r\nInvalid option\r\n> ");
         }
         break;
 
     //
     case UI_MENU_MODE:
-    	if (b == '1') {
+    	if (key == '1') {
     		game_mode = MODE_CLASSIC;
     	    printf("\r\nClassic mode selected\r\n");
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
     	}
-    	else if (b == '2') {
+    	else if (key == '2') {
     	    printf("\r\nSpeed mode selected\r\n");
     	    game_mode = MODE_SPEED;
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
     	}
-    	else if (b == '3') {
+    	else if (key == '3') {
     	    printf("\r\nTwo players mode selected\r\n");
     	    game_mode = MODE_2P;
     	    ui = UI_MENU_SIZE;
     	    show_choose_size();
     	}
-        else if (b == '0') {
-            ui = UI_MENU_MAIN;
-            show_main();
-        }
-        else if (b != '\r' && b != '\n') {
+        else if (key != '\r' && key != '\n') {
         printf("\r\nInvalid option\r\n> ");
         }
         break;
 
     //
     case UI_MENU_SIZE:
-        if (b >= '3' && b <= '9') {
+        if (key >= '3' && key <= '9') {
            /* board_size = (uint8_t)(b - '0'); // TODO!!!
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);*/
             board_size =  '3'-'0';  // TODO!!!!: enable real sizes later
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);
             ui = UI_GAME;
-            printf("Press q to quit\r\n> ");
+            printf("Press 0 to quit\r\n> ");
         }
-        else if (b == '0') {
-            ui = UI_MENU_MAIN;
-            show_main();
-        }
-        else if (b != '\r' && b != '\n') {
+        else if (key != '\r' && key != '\n') {
             printf("\r\nInvalid size (3-9)\r\n> ");
         }
         break;
 
-    //
-    case UI_GAME:
-        if (b == 'q') {
-            ui = UI_MENU_MAIN;
-            show_main();
-        }
+    case UI_RULES:
         break;
 
-    //
-        case UI_RULES:
-            if (b == '0') { show_main(); ui = UI_MENU_MAIN; }
-            break;
+    case UI_GAME:
+        break;
     }
 }
 
-//GETTERS
-
-ui_state_t get_game_state(void)
-{
-    return ui;
-}
-
-uint8_t get_game_size(void)
-{
-    return board_size;
-}
-
-game_mode_t get_game_mode(void)
-{
-    return game_mode;
-}

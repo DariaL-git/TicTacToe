@@ -13,24 +13,21 @@ static int uart_try_get(uint8_t *b)
     return 1;
 }
 
-int input_get_move(uint8_t n)
+int get_key_input(void)
 {
-    uint8_t b;
-    if (!uart_try_get(&b))
+    uint8_t key;
+    if (!uart_try_get(&key))
         return -1;
 
-    if (b == 'q')
-        return -2;
+    if (key == '\r' || key == '\n')
+        return -1;
+
+    if (key == '0')
+        return -2;   // global reset to main menu
 
     // only one symbol yet -> '1'..'9'!!!!!!!!!TODO
-    if (b >= '1' && b <= '9')
-    {
-        uint16_t cell = (uint16_t)(b - '1');        // '1'->0 ... '9'->8
-        uint16_t max  = (uint16_t)n * (uint16_t)n;  // n*n
-
-        if (cell < max)
-            return (int)cell;
-    }
+    if (key >= '1' && key <= '9')
+        return (int)key;
 
     return -1;
 }

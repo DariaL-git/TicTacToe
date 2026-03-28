@@ -19,3 +19,9 @@ typedef enum {
     CELL_X,
     CELL_O
 } cell_t;
+
+typedef enum {
+    MODE_CLASSIC,
+    MODE_SPEED,
+	MODE_2P
+} game_mode_t;

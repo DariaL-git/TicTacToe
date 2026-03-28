@@ -1,59 +1,70 @@
-#include <game_controller.h>
+#include "game_controller.h"
 #include "game_logic.h"
 #include "main.h"
 #include "input.h"
+#include "config.h"
+#include "view.h"
 #include <stdio.h>
-#include <view.h>
 
-void game_controller_run(game_mode_t mode, uint8_t n)
+void game_controller_run(game_mode_t mode, uint8_t board_size)
 {
     game_t g;
-    game_init(&g, n, mode);
+    game_init(&g, board_size, mode);
 
-    uint32_t next500 = HAL_GetTick() + 500;
-    render_gameboard_uart(&g);
+    uint32_t next_ms = HAL_GetTick() + TICK_MS;
+    uint8_t game_over_shown = 0;
+    render_gameboard(&g);
 
     while (1)
     {
         uint8_t redraw = 0;
 
         // 1) tick 500ms
-        if ((int32_t)(HAL_GetTick() - next500) >= 0)
+        if ((int32_t)(HAL_GetTick() - next_ms) >= 0)
         {
-            next500 += 900;
-            ui_uart_tick_ms(&g);   // only if show_numbers ^= 1
+            next_ms += TICK_MS;
+            update_numbers_output(&g);   // only if show_numbers ^= 1
             redraw = 1;
         }
 
         // 2) human input q (not blocked):
+        int key = get_key_input();
+
         // return -2 == quit to main menu
-        int cell = input_get_move(n);
-        if (cell == -2)
+        if (key == -2)
             return;
 
         // 3) moves only while game is active
                if (g.state == GAME_IN_PROGRESS)
                 {
-                    if (cell >= 0)
-                        redraw |= game_apply_move(&g, (uint16_t)cell);
-                    if (g.state == GAME_IN_PROGRESS && ai_can_move_now(&g))
+            	    if (key >= '1' && key <= '9')
+            	    {
+            	        int cell = key - '1';
+
+            	        if (cell < board_size * board_size)
+            	            redraw |= game_player_move(&g, (uint16_t)cell);
+            	    }
+                    if (ai_can_move_now(&g))
                         redraw |= game_ai_step(&g);
                 }
 
         // 4) render
         if (redraw)
-            render_gameboard_uart(&g);
+            render_gameboard(&g);
 
         if (g.state != GAME_IN_PROGRESS)
         {
-        	show_game_over_uart(&g);
-
-            while (1)
+            if (!game_over_shown)
             {
-                int c = getchar();
-                if (c == 'q')
-                    return;
+                show_game_over(&g);
+                game_over_shown = 1;
             }
+
+            int key = get_key_input();
+            if (key == -2)
+                return;
+
+            continue;
         }
     }
 }

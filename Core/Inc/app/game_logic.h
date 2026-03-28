@@ -4,11 +4,7 @@
 
 #define GAME_MAX_N 9
 
-typedef enum {
-    MODE_CLASSIC,
-    MODE_SPEED,
-	MODE_2P
-} game_mode_t;
+
 
 typedef struct {
     game_mode_t mode;					   // game mode
