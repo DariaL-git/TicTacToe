@@ -1,6 +1,8 @@
-#ifndef INC_NEOPIXEL_H_
-#define INC_NEOPIXEL_H_
+#pragma once
+#include <stdint.h>
 
-void set_color(uint8_t red, uint8_t green, uint8_t blue);
+#define LED_COUNT 12
 
-#endif /* INC_NEOPIXEL_H_ */
+void neopixel_set(uint8_t led, uint8_t r, uint8_t g, uint8_t b);
+void neopixel_show(void);
+void neopixel_clear(void);

@@ -159,4 +159,3 @@ uint8_t game_ai_step(game_t *g)
 
     return 0; // no move possible
 }
-
