@@ -54,24 +54,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-/*uint16_t pwmData[64] = {
-    // G = 0
-    20,20,20,20,20,20,20,20,
 
-    // R = 255
-    40,40,40,40,40,40,40,40,
 
-    // B = 0
-    20,20,20,20,20,20,20,20,
-
-    // reset
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0
-};
-*/
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -190,13 +174,13 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t r=0,g=0,b=0,loop=0;
+  //uint8_t r=0,g=0,b=0,loop=0;
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  set_color(r,g,b);
+	 /*set_color(r,g,b);
 	      HAL_Delay(10);
 
 	      switch(loop)
@@ -219,7 +203,7 @@ int main(void)
 
 	          default: loop=0;
 	      }
-
+*/
 	//HAL_GPIO_TogglePin(LD3_GPIO_Port,LD3_Pin);
 	  //printf("System hren\r\n");
 	 // HAL_Delay(1000);

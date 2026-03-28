@@ -1,13 +1,7 @@
-/*
- * output_ring.h
- *
- *  Created on: Mar 28, 2026
- *      Author: Professional
- */
+#ifndef OUTPUT_RING_H
+#define OUTPUT_RING_H
 
-#ifndef INC_INP_OUT_OUTPUT_RING_H_
-#define INC_INP_OUT_OUTPUT_RING_H_
+void show_game_over_ring(void);
+void animate_game_over_ring(void);
 
-
-
-#endif /* INC_INP_OUT_OUTPUT_RING_H_ */
+#endif
