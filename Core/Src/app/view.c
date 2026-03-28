@@ -1,6 +1,4 @@
 #include "view.h"
-#include <stdio.h>
-#include <stdint.h>
 #include "output_uart.h"
 
 void show_main(void)

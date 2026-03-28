@@ -1,6 +1,6 @@
 #include "game_controller.h"
 #include "game_logic.h"
-#include "main.h"
+#include "time.h"
 #include "input.h"
 #include "config.h"
 #include "view.h"
@@ -9,9 +9,11 @@
 void game_controller_run(game_mode_t mode, uint8_t board_size)
 {
     game_t g;
-    game_init(&g, board_size, mode);
+    uint32_t now = time_ms();
+    uint8_t first_turn = now & 1;
+    game_init(&g, board_size, mode, first_turn, now);
 
-    uint32_t next_ms = HAL_GetTick() + TICK_MS;
+    uint32_t next_ms = now + TICK_MS;
     uint8_t game_over_shown = 0;
     render_gameboard(&g);
 
@@ -20,18 +22,20 @@ void game_controller_run(game_mode_t mode, uint8_t board_size)
         uint8_t redraw = 0;
 
         // 1) tick 500ms
-        if ((int32_t)(HAL_GetTick() - next_ms) >= 0)
+        uint32_t now = time_ms();
+
+        if ((int32_t)(now - next_ms) >= 0)
         {
             next_ms += TICK_MS;
-            update_numbers_output(&g);   // only if show_numbers ^= 1
+            update_numbers_output(&g);
             redraw = 1;
         }
 
         // 2) human input q (not blocked):
         int key = get_key_input();
 
-        // return -2 == quit to main menu
-        if (key == -2)
+        // return == quit to main menu
+        if (key == '0')
             return;
 
         // 3) moves only while game is active
@@ -44,7 +48,7 @@ void game_controller_run(game_mode_t mode, uint8_t board_size)
             	        if (cell < board_size * board_size)
             	            redraw |= game_player_move(&g, (uint16_t)cell);
             	    }
-                    if (g.state == GAME_IN_PROGRESS && ai_can_move_now(&g))
+                    if (g.state == GAME_IN_PROGRESS && ai_can_move_now(&g, now))
                         redraw |= game_ai_step(&g);
                 }
 

@@ -1,16 +1,15 @@
 #include "game_logic.h"
-#include "main.h"
 #include "config.h"
 
-void game_init(game_t *g, uint8_t board_size, game_mode_t mode)
+void game_init(game_t *g, uint8_t board_size, game_mode_t mode, uint8_t first_turn, uint32_t now)
 {
     g->mode = mode;
     g->board_size = board_size;
-    g->turn = (HAL_GetTick() & 1);  // 0=X first, 1=O first (random) for classik/2P mode
+    g->turn = first_turn;  // 0=X first, 1=O first (random) for classik/2P mode
     g->moves = 0;
-    g->ai_next = HAL_GetTick() + TICK_MS;
-    g->state = GAME_IN_PROGRESS;
     g->winner = CELL_EMPTY;
+    g->ai_next = now + TICK_MS;
+    g->state = GAME_IN_PROGRESS;
 
     for (uint8_t y = 0; y < board_size; y++)
         for (uint8_t x = 0; x < board_size; x++)
@@ -118,17 +117,7 @@ uint8_t game_player_move(game_t *g, uint16_t cell)
     return game_make_move(g, cell);
 }
 
-uint8_t speed_timer_ready(game_t *g)
-{
-    if ((int32_t)(HAL_GetTick() - g->ai_next) >= 0)
-    {
-        g->ai_next = HAL_GetTick() + TICK_MS;
-        return 1;
-    }
-    return 0;
-}
-
-uint8_t ai_can_move_now(game_t *g)
+uint8_t ai_can_move_now(game_t *g, uint32_t now)
 {
     if (g->state != GAME_IN_PROGRESS)
         return 0;
@@ -136,12 +125,15 @@ uint8_t ai_can_move_now(game_t *g)
     switch (g->mode)
     {
     case MODE_CLASSIC:
-        if (g->turn != 1)     // AI = O
-            return 0;
-        return 1;
+    	return (g->turn == 1);     // AI = O
 
     case MODE_SPEED:
-        return speed_timer_ready(g);
+            if ((int32_t)(now - g->ai_next) >= 0)
+            {
+                g->ai_next = now + TICK_MS;
+                return 1;
+            }
+            return 0;
 
     default:
         return 0;

@@ -17,11 +17,10 @@ typedef struct {
     game_state_t state;
 } game_t;
 
-void game_init(game_t *g, uint8_t board_size, game_mode_t mode);
+void game_init(game_t *g, uint8_t board_size, game_mode_t mode, uint8_t first_turn, uint32_t now);
 uint8_t game_make_move(game_t *g, uint16_t cell);
 uint8_t game_check_winner(const game_t *g);
 uint8_t game_is_draw(const game_t *g);
-uint8_t speed_timer_ready(game_t *g);
-uint8_t ai_can_move_now(game_t *g);
+uint8_t ai_can_move_now(game_t *g, uint32_t now);
 uint8_t game_ai_step(game_t *g);
 uint8_t game_player_move(game_t *g, uint16_t cell);
