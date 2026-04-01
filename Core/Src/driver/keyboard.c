@@ -1,0 +1,58 @@
+/*
+ * keyboard.c
+ *
+ * Version 2 / verbessert mit callback-function
+ *
+ *  Created on: Nov 19, 2024
+ *      Author: DJ
+ */
+
+#include "keyboard.h"
+
+
+static SPI_HandleTypeDef *keyboard_hspi=NULL;   //SPI-Handler zunaechst NULL, wird in der init gesetzt.
+static uint8_t keyrate=0xff;	        // Abtasrate auf max (255ms)
+
+/*  keyboard_init : Uebergibt den SPI-Handler und die Abtastrate (Lesezykus) in ms
+ */
+
+
+void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate)
+{
+	keyboard_hspi=hspi;		// SPI-Handler setzen
+    keyrate=ms_rate; 		// Leserate setzen
+}
+
+/*  get_key_1ms :  Zyklisches einlesen des Tasturwertes ueber SPI.
+ *                 Die Zykluszeit bestimmt die gl.Variable keyrate.
+ *                 Einmaliger Aufruft der callback-Funktion mit Tastenwert als Parameter.
+ *                 Erst nach erneuten Tastendruck erfogt der nächste callback-Aufruf.
+ *
+ * 	Rückgabe : keine
+ */
+
+void get_key_1ms(void)
+{
+	static uint8_t ms_counter=0;
+	static uint8_t key=0,lastkey=0;
+	uint8_t i;
+    uint16_t spi_val;
+
+    ms_counter++;
+    if(ms_counter>keyrate) // Tasten erst lesen wenn Zeit erreicht
+    {
+    	ms_counter=0;
+		if(NULL!= keyboard_hspi) // ist Handler initiert?
+		{
+			HAL_SPI_Receive(keyboard_hspi,(uint8_t*) &spi_val, 1,50); //Tastaturwert 1x16Bit lesen, mit 50ms timeout
+			printf("spi=0x%04X\r\n", spi_val);
+			key=0;
+			for(i=0;i<16;i++) 			// Taste heraus filtern
+				if((~spi_val)&(1<<i))
+					key=i+1;
+		}
+		if ((key!=0) && (lastkey==0))    //erstes mal?
+			 keyboard_callback(key);
+		lastkey=key;
+    }
+}

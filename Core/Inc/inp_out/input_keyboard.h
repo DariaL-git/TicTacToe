@@ -6,4 +6,4 @@
  */
 
 #pragma once
-int input_get_key_button(void);
+int input_get_key_keyboard(void);
