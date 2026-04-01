@@ -33,6 +33,7 @@ void menu_controller_run(game_mode_t *mode, uint8_t *n)
     	}
 
     	int key = get_key_input();
+    	//printf("key=%d\r\n", key);
     	if (key < 0)
     	    continue;
     	menu_handle_input((uint8_t)key);

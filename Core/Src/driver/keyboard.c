@@ -6,6 +6,7 @@
  *  Created on: Nov 19, 2024
  *      Author: DJ
  */
+
 #include "keyboard.h"
 
 
@@ -14,6 +15,8 @@ static uint8_t keyrate=0xff;	        // Abtasrate auf max (255ms)
 
 /*  keyboard_init : Uebergibt den SPI-Handler und die Abtastrate (Lesezykus) in ms
  */
+
+
 void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate)
 {
 	keyboard_hspi=hspi;		// SPI-Handler setzen
@@ -27,6 +30,7 @@ void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate)
  *
  * 	Rückgabe : keine
  */
+
 void get_key_1ms(void)
 {
 	static uint8_t ms_counter=0;
@@ -41,6 +45,7 @@ void get_key_1ms(void)
 		if(NULL!= keyboard_hspi) // ist Handler initiert?
 		{
 			HAL_SPI_Receive(keyboard_hspi,(uint8_t*) &spi_val, 1,50); //Tastaturwert 1x16Bit lesen, mit 50ms timeout
+			printf("spi=0x%04X\r\n", spi_val);
 			key=0;
 			for(i=0;i<16;i++) 			// Taste heraus filtern
 				if((~spi_val)&(1<<i))
@@ -51,5 +56,3 @@ void get_key_1ms(void)
 		lastkey=key;
     }
 }
-
-

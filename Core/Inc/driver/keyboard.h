@@ -8,11 +8,12 @@
 #ifndef INC_KEYBOARD_H_
 #define INC_KEYBOARD_H_
 
+
 #include "stdint.h"
 #include "spi.h"
 
-void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate);
+int input_get_key_keyboard(void);
+/*void keyboard_init(SPI_HandleTypeDef *hspi, uint8_t ms_rate);
 void get_key_1ms(void);
-void keyboard_callback(uint8_t key_val);
+void keyboard_callback(uint8_t key_val);*/
 #endif /* INC_KEYBOARD_H_ */
-

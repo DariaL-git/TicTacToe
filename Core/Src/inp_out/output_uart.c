@@ -28,7 +28,7 @@ void show_mode_menu_uart(void)
     printf("1 - Classic\r\n");
     printf("2 - Speed\r\n");
     printf("3 - two players\r\n");
-    printf("0 - Back\r\n> ");
+    printf("Press 0 to back (or 10-button).\r\n>");
 }
 
 void show_choose_size_uart(void)
@@ -36,7 +36,7 @@ void show_choose_size_uart(void)
 	printf("\r\n\r\n\r\n");
     printf("\r\n=== BOARD SIZE ===\r\n");
     printf("Enter size (3-9)\r\n");
-    printf("0 - Back\r\n> ");
+    printf("Press 0 to back (or 10-button).\r\n>");
 }
 
 void show_rules_uart(void)
@@ -44,7 +44,7 @@ void show_rules_uart(void)
 	//TODO!!!!!!!!!!!!!!!
 	printf("\r\n\r\n\r\n");
     printf("\r\nRules: make 3 in a row. Blablabla!!!!!!!!!!!!!!!!!!!!!!!!!\r\n");
-    printf("Press 0 to back.\r\n> ");
+    printf("Press 0 to back (or 10-button).\r\n> ");
 }
 
 //
@@ -70,7 +70,7 @@ void render_gameboard_uart(game_t *g)
 {
     printf("\033[2J\033[H");
 
-	printf("Press 0 to quit\r\n");
+	printf("Press 0 to quit. (or 10-button).\r\n>\r\n");
 
     for (int r = 0; r < g->board_size; r++)
     {
@@ -109,5 +109,5 @@ void show_game_over_uart(game_t *g)
         printf("\r\nDraw!\r\n");
     }
 
-    printf("Press 0 to return\r\n");
+    printf("Press 0 to return (or 10-button).\r\n>\r\n");
 }

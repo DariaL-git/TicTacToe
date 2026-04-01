@@ -1,4 +1,3 @@
-#include <game_controller.h>
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -21,6 +20,7 @@
 #include "main.h"
 #include "dma.h"
 #include "i2c.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -33,6 +33,9 @@
 #include "retarget_stdio.h"
 #include "neopixel.h"
 #include "menu_controller.h"
+#include <game_controller.h>
+#include "keyboard.h"
+
 
 /* USER CODE END Includes */
 
@@ -127,8 +130,10 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
+ // keyboard_init(&hspi1, 10);
 
   /*  //test UART
   uint8_t msg[] = "Hello\r\n";
@@ -143,7 +148,12 @@ int main(void)
   lcd_clr();
   char *s = "LCD OK!";
   for (int i = 0; s[i] && i < 8; i++) lcd_putc(s[i]);
-/*
+
+ /* void keyboard_callback(uint8_t key_val)
+  {
+      printf("KEY: %d\r\n", key_val);
+  }*/
+  /*
   //test LCD connecttion
   printf("I2C scan...\r\n");
   for (uint8_t a = 1; a < 0x7F; a++) {
@@ -208,6 +218,9 @@ int main(void)
 	  //printf("System hren\r\n");
 	 // HAL_Delay(1000);
 
+	  /*  get_key_1ms();
+	    HAL_Delay(1);
+*/
 
 	    game_mode_t mode;
 	    uint8_t n;
@@ -263,7 +276,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void keyboard_callback(uint8_t key_val)
+{
+    printf("KEY: %d\r\n", key_val);
+}
 /* USER CODE END 4 */
 
 /**

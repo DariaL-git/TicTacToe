@@ -1,6 +1,6 @@
+#include "input_keyboard.h"
 #include "input.h"
 #include "input_uart.h"
-#include "input_buttons.h"
 
 int get_key_input(void)
 {
@@ -10,7 +10,7 @@ int get_key_input(void)
     if (key >= 0)
         return key;
 
-    key = input_get_key_button();
+    key = input_get_key_keyboard();
     if (key >= 0)
         return key;
 
