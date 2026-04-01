@@ -33,7 +33,7 @@
 #include "retarget_stdio.h"
 #include "neopixel.h"
 #include "menu_controller.h"
-#include <game_controller.h>
+#include "game_controller.h"
 #include "keyboard.h"
 
 
@@ -144,42 +144,12 @@ int main(void)
   printf("System start\r\n");
 
 */
+  /*  //test LCD
   lcd_init(&hi2c1);
   lcd_clr();
   char *s = "LCD OK!";
   for (int i = 0; s[i] && i < 8; i++) lcd_putc(s[i]);
-
- /* void keyboard_callback(uint8_t key_val)
-  {
-      printf("KEY: %d\r\n", key_val);
-  }*/
-  /*
-  //test LCD connecttion
-  printf("I2C scan...\r\n");
-  for (uint8_t a = 1; a < 0x7F; a++) {
-    if (HAL_I2C_IsDeviceReady(&hi2c1, a<<1, 2, 50) == HAL_OK) {
-      printf("FOUND 0x%02X\r\n", a);
-    }
-  }
-  printf("scan end\r\n");
 */
-
-/* ui_state_t prev = ui_get_state();
-  game_t g;
-  uint8_t game_ready = 0;
-  uint32_t timer = HAL_GetTick();
-*/
-
-  //HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t*)pwmData, 64);
-  uint32_t pwm_dat[1000];
-  for(int i=0;i<500;i++) pwm_dat[i]=i/5;
-  for(int i=500;i<1000;i++) pwm_dat[i]=200-i/5;
-
-  if (HAL_OK != HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_2, pwm_dat, 1000))
-  {
-      Error_Handler();
-  }
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -190,43 +160,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	 /*set_color(r,g,b);
-	      HAL_Delay(10);
-
-	      switch(loop)
-	      {
-	          case 0: r++;                 // rot dimmen
-	              if (r==0) loop++;
-	              break;
-
-	          case 1: g++;                 // gruen dimmen
-	              if (g==0) loop++;
-	              break;
-
-	          case 2: b++;                 // blau dimmen
-	              if (b==0) loop++;
-	              break;
-
-	          case 3: b++; r++; g++;       // weiss dimmen
-	              if (r==0) loop=0;
-	              break;
-
-	          default: loop=0;
-	      }
-*/
-	//HAL_GPIO_TogglePin(LD3_GPIO_Port,LD3_Pin);
-	  //printf("System hren\r\n");
-	 // HAL_Delay(1000);
-
-	  /*  get_key_1ms();
-	    HAL_Delay(1);
-*/
-
 	    game_mode_t mode;
 	    uint8_t n;
 	    menu_controller_run(&mode, &n);
 	    game_controller_run(mode, n);
-
   }
   /* USER CODE END 3 */
 }
@@ -276,10 +213,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void keyboard_callback(uint8_t key_val)
-{
-    printf("KEY: %d\r\n", key_val);
-}
 /* USER CODE END 4 */
 
 /**

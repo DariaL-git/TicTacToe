@@ -103,8 +103,8 @@ void menu_handle_input(uint8_t key)
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);*/
             board_size =  '3'-'0';  // TODO!!!!: enable real sizes later
             printf("\r\nBoard: %dx%d\r\n", board_size, board_size);
+            HAL_Delay(1500);
             ui = UI_GAME;
-            printf("Press 0 to quit\r\n> ");
         }
         else if (key != '\r' && key != '\n') {
             printf("\r\nInvalid size (3-9)\r\n> ");
