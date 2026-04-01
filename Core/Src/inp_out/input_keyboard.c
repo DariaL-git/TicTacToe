@@ -18,7 +18,7 @@ int input_get_key_keyboard(void)
     uint32_t now = time_ms();
 
     //
-    if ((now - last_poll) < 20)
+    if ((now - last_poll) < 50)
         return -1;
 
     last_poll = now;

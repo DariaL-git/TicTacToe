@@ -133,6 +133,7 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   RetargetInit(&huart2);
+  lcd_init(&hi2c1);
  // keyboard_init(&hspi1, 10);
 
   /*  //test UART
@@ -144,12 +145,12 @@ int main(void)
   printf("System start\r\n");
 
 */
-  /*  //test LCD
-  lcd_init(&hi2c1);
+  /*
+  //test LCD
   lcd_clr();
   char *s = "LCD OK!";
   for (int i = 0; s[i] && i < 8; i++) lcd_putc(s[i]);
-*/
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */

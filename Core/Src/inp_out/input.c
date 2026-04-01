@@ -13,7 +13,6 @@ int get_key_input(void)
     key = input_get_key_keyboard();
     if (key >= 0)
         return key;
-
     return -1;
 }
 
