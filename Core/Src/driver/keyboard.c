@@ -44,7 +44,7 @@ void get_key_1ms(void)
     	ms_counter=0;
 		if(NULL!= keyboard_hspi) // ist Handler initiert?
 		{
-			HAL_SPI_Receive(keyboard_hspi,(uint8_t*) &spi_val, 1,50); //Tastaturwert 1x16Bit lesen, mit 50ms timeout
+			HAL_SPI_Receive(keyboard_hspi,(uint8_t*) &spi_val, 1,30); //Tastaturwert 1x16Bit lesen, mit 50ms timeout
 			printf("spi=0x%04X\r\n", spi_val);
 			key=0;
 			for(i=0;i<16;i++) 			// Taste heraus filtern
